@@ -1,0 +1,55 @@
+#!/usr/bin/perl -w
+# From: 「LinuxサーバHacks」(オライリー)
+use strict;
+use Term::ANSIColor qw(:constants);
+
+my (%target, %flavor);
+
+my $rcgrc = "$ENV{HOME}/.rcgrc";
+
+### -b オプションが指定されていて、$rcgrc があるときは先読み
+if ( grep { $_ eq '-b' } @ARGV and -f $rcgrc ) {
+	open F, '<', $rcgrc;
+	while (<F>) {
+		next if /^\s*#/;
+		chomp;
+		my @line = split /\s+/;
+		my $bname = shift @line;
+		$flavor{$bname} = { @line };
+	}
+	close F;
+}
+
+### 現状、-b は先頭にまとめて宣言しなくてはならない
+while ( $ARGV[0] and $ARGV[0] eq '-b' ) {
+	shift;
+	my $bname = shift or die "rcg: -b option require name\n";
+	if ( $flavor{$bname} ) {
+		while ( my ($key, $value) = each %{$flavor{$bname}} ) {
+			$value = eval uc $value or next;
+			$target{$key} = $value;
+		}
+	} else {
+		warn "rcg: undefined rule '$bname'!\n";
+	}
+}
+
+### 引数を解析
+while ( my $arg = shift ) {
+	my $value = $arg eq '-s' ? shift : uc shift;
+	if ( $arg eq '-h' || !$value ) {
+		print "Usage: rcg [regex] [color] [regex] [color] ...\n";
+		exit;
+	}
+	if ( $value =~ /^[A-Z_. ]+$/ and $value = eval $value ) {
+		$target{$arg} = $value;
+	}
+}
+
+### 標準入力に色を付ける
+while (<>) {
+	foreach my $x ( keys %target ) {
+		s/($x)/$target{$x}$1@{[RESET]}/g;
+	}
+	print;
+}
