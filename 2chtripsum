@@ -1,0 +1,104 @@
+#!/usr/bin/env perl
+# ogata 2013/01/07
+# see: http://ja.wikipedia.org/w/index.php?title=%E3%83%88%E3%83%AA%E3%83%83%E3%83%97_(%E9%9B%BB%E5%AD%90%E6%8E%B2%E7%A4%BA%E6%9D%BF)
+
+use strict;
+use warnings;
+use utf8;
+use File::Basename;
+use Encode;
+use Digest::SHA qw(sha1_base64);
+
+my $DEBUG = 1;
+
+my $TERMINAL_ENCODING = 'utf-8';
+binmode STDOUT, ':utf8';
+
+if ( $ENV{LANG} && $ENV{LANG} =~ /euc/i ) {
+    $TERMINAL_ENCODING = 'euc-jp';
+    binmode STDOUT, ':encoding(euc-jp)';
+}
+
+my $RANDOM_MODE = 0;
+my $RANDOM_MODE_TRY_COUNT = 1_000_000;
+my $RANDOM_MODE_LENGTH = 16; # ランダムモードでは12バイト以上の強力なやつを選ぶ
+
+#$tripkey = "#istrip";  # トリップキー文字列（# 付き）
+
+if ( !@ARGV ) {
+    print basename($0) . " trip_string [,trip_string2, ...]";
+    exit;
+}
+
+if ( $ARGV[0] eq 'RANDOM' || $RANDOM_MODE == 1 ) {
+    warn "=== START RANDOM MODE ===\n";
+    $RANDOM_MODE = 1;
+    #sleep 2;
+}
+
+my @tripkeys = @ARGV;
+
+if ( $RANDOM_MODE ) {
+    # TODO: これだと一時確保のためのメモリ食っちゃうんだよなぁ…
+    # TODO: tripkeys を tie 変数にする？
+    for (my $i = 0; $i <= $RANDOM_MODE_TRY_COUNT; $i++) {
+        push @tripkeys, random_string();
+    }
+}
+
+for my $tripkey (@tripkeys) {
+    # $tripkey, $trip, $salt はバイト列
+    $tripkey = substr($tripkey, 1) if index($tripkey, '#') == 0;
+    my $trip;
+    if ( length $tripkey >= 12 ) {
+        # 新形式
+        #Encode::from_to($tripkey, $TERMINAL_ENCODING, 'Shift_JIS') if $tripkey =~ /[^!-~]/;
+        $trip = substr(sha1_base64($tripkey), 0, 12);
+        $trip =~ tr/+/./;
+    }
+    else {
+        # 従来形式
+        Encode::from_to($tripkey, $TERMINAL_ENCODING, 'Shift_JIS'), do {warn "multibytes character found.\n" if $DEBUG; } if $tripkey =~ /[^!-~]/; # NOTE: ASCII文字テーブルに依存している
+        my $salt = substr($tripkey . 'H.', 1, 2);
+        $salt =~ s/[^\.-z]/\./go;
+        $salt =~ tr/:;<=>?@[\\]^_`/ABCDEFGabcdef/;
+        $trip = substr(crypt($tripkey,$salt), -10);
+    }
+    print "$tripkey\t◆$trip\n";
+}
+
+{
+my @chars; BEGIN { @chars = map { chr($_) } (0x21..0x7E); }
+sub random_string {
+    my $len = shift || $RANDOM_MODE_LENGTH;
+    die "random_string: lenght is strange." if !$len || $len <= 1;
+    my $str = '';
+    $str .=  $chars[int(rand(@chars))] for 1.. $len;
+    return $str;
+}
+}
+
+
+
+# if (length $handle_pass >= 12)
+# {
+#     my $mark = substr($handle_pass, 0, 1);
+#     if ($mark eq '#' || $mark eq '$')
+#     {
+#         if ($handle_pass =~ m|^#([[:xdigit:]]{16})([./0-9A-Za-z]{0,2})$|)
+#         {
+#             $GB->{TRIPSTRING} = substr(crypt(pack('H*', $1), "$2.."), -10);
+#         }
+#         else
+#         {
+#             # 将来の拡張用
+#             $GB->{TRIPSTRING} = '???';
+#         }
+#     }
+#     else
+#     {
+#         use Digest::SHA1 qw(sha1_base64);
+#         $GB->{TRIPSTRING} = substr(sha1_base64($handle_pass), 0, 12);
+#         $GB->{TRIPSTRING} =~ tr/+/./;
+#     }
+# }
