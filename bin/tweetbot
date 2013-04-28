@@ -1,0 +1,178 @@
+#!/usr/bin/env perl
+# ogata 2013/01/05
+# まだまだ未完成
+
+use strict;
+use warnings;
+use utf8;
+
+use Encode;
+use File::Basename;
+
+my $DEBUG = 1;
+
+my @commands = (qw(timeline mentions retweets direct_messages lists
+favorites search status user_profile post
+follow unfollow favorite unfavorite retweet list));
+
+my @no_arg_commands = (qw(timeline mentions retweets direct_messages lists favorites));
+
+#my @simple_one_arg_command = (qw()); # not implement yet
+
+my %command_of = map { $_ => 1 } @commands;
+my %no_arg_command_of = map { $_ => 1 } @no_arg_commands;
+
+if ( ($ARGV[0]||'') =~ /^(?:-h|--help|--usage)$/ ) {
+    my $myname = basename($0);
+    print <<'END_USAGE';
+Usage:
+  $myname [screenname] command args...
+
+command:
+  timeline
+  mentions
+  retweets
+  direct_messages
+  lists
+  search [search_query]                  ### can not used with search_query.
+  status <twitter_id|tweet_id|tweet_url>
+  user_profile <screenname|user_id>
+  post [post_text]
+  
+  ### following is not implemented yet.
+  #unfollow <screenname|user_id>
+  #favorite <tweet_id|tweet_url>
+  #unfavorite <tweet_id|tweet_url>
+  #retweet <tweet_id|tweet_url>
+  #list <list_id>
+END_USAGE
+    exit;
+}
+
+my ($screen_name, $command, @args) = $command_of{$ARGV[0]||''} ? ('', shift @ARGV, @ARGV)
+                           :                                 (shift @ARGV, shift @ARGV, @ARGV)
+                           ;
+
+if ( !$command || !$command_of{$command} ) {
+    print "command is not specify. open tweetbot.\n";
+#    exec 'open', 'tweetbot://' . ($screen_name || '') . '/';
+    exec_open_tweetbot($screen_name||'');
+}
+
+warn "screen_name=$screen_name command=$command\n" if $DEBUG;
+warn "args => " . join(" / ", @args) . "\n" if $DEBUG;
+
+# if ( !@args ) {
+#     my $open_url = 'tweetbot://' . ($screen_name||'') . '/' . $command;
+#     print "command is $command. open tweetbot.\n";
+#     exec_open_tweetbot($screen_name);
+#     exec 'open', $open_url;
+# }
+if ( $no_arg_command_of{$command} ) {
+    exec_open_tweetbot($screen_name, $command);
+}
+elsif ( $command eq 'search' ) {
+    my $query = $args[0];
+    if ( $query ) {
+        exec_open_tweetbot($screen_name, $command, { query => $query });
+    }
+    else {
+        exec_open_tweetbot($screen_name, $command);
+    }
+}
+elsif ( $command eq 'status' ) {
+    my $tweet_id;
+    if ( !$args[0] ) {
+        die "status: status requires <twitter_id|tweet_id|tweet_url> as 1st argument.\n"
+    }
+    elsif ( $args[0] =~ m{\bhttps?://twitter\.com/\w+/status/(\d+)} ) {
+        # If it seems tweet_url or STOT form.
+        warn "status: tweet_id is picked up $1\n" if $DEBUG;
+        $tweet_id = $1;
+    }
+    elsif ( $args[0] =~ /^\d+$/ ) {
+        # if it seems digit as tweet_id.
+        $tweet_id = $args[0];
+    }
+
+    if ( !$tweet_id ) {
+        die "status: tweet_id is not found.";
+    }
+    exec_open_tweetbot($screen_name, 'status', $tweet_id);
+}
+elsif ( $command eq 'user_profile' ) {
+    my $user_screen_name = $args[0];
+    if ( $user_screen_name ) {
+        exec_open_tweetbot($screen_name, $command, $user_screen_name);
+    }
+    else {
+        die "user_profile: user_profile reqquires <screenname|user_id>.\n";
+    }
+}
+elsif ( $command eq 'post' ) {
+    my $post_text = $args[0];
+    if ( defined $post_text && length $post_text ) {
+        exec_open_tweetbot($screen_name, $command, { text => $post_text });
+    }
+    else {
+        # post 画面を開く
+        exec_open_tweetbot($screen_name, $command);
+    }
+}
+
+### (stub)...
+
+sub exec_open_tweetbot {
+    my ($screen_name, $command, @args) = @_;
+    $screen_name ||= '';
+    my $tweetbot_url = tweetbot_url_construct($screen_name, $command, @args);
+    #warn "param query is $param->{query}";
+#     warn join ' ', '$ open', 'tweetbot://' . ($screen_name) . '/'. (join '/', $command, @args) . ($param ? '?' . join '&', map { $_ . "=" . $param->{$_}  } keys %$param : '') . "\n" if $DEBUG;
+#     exec 'open', 'tweetbot://' . ($screen_name) . '/'. (join '/', $command, @args) . ($param ? '?' . join '&', map { $_ . "=" . $param->{$_}  } keys %$param : '');
+    warn join ' ', '$ open', $tweetbot_url . "\n" if $DEBUG;
+    exec 'open', $tweetbot_url;
+}
+
+sub tweetbot_url_construct {
+    my @parts = @_;
+    my $param = defined $parts[-1] && ref $parts[-1] eq 'HASH' ? pop @parts : undef;
+    return 'tweetbot://' .
+        join('/', @parts) .
+        ($param ? '?' . join '&', map { $_ . "=" . $param->{$_}  } keys %$param : '');
+
+}
+
+__END__
+
+http://ewa4618.tumblr.com/post/4986633869
+
+バージョン1.0.2以降
+
+tweetbot://<screenname>/timeline
+tweetbot://<screenname>/mentions
+tweetbot://<screenname>/retweets
+tweetbot://<screenname>/direct_messages
+tweetbot://<screenname>/lists
+tweetbot://<screenname>/favorites
+tweetbot://<screenname>/search
+tweetbot://<screenname>/search?query=<text> ← これ使えないっぽい
+tweetbot://<screenname>/status/<twitter_id>
+tweetbot://<screenname>/user_profile/<profile_screenname>
+tweetbot://<screenname>/post
+tweetbot://<screenname>/post?text=<text>
+バージョン1.3以降 
+
+tweetbot://<screenname>/post?text=&callback_url=<url>&in_reply_to_status_id=<tweet_id>
+tweetbot://<screenname>/search?query=&callback_url=<url>
+tweetbot://<screenname>/status/<tweet_id>?callback_url=<url>
+tweetbot://<screenname>/user_profile/<screenname|user_id>|<screenname|user_id>?callback_url=<url>
+tweetbot://<screenname>/follow/<screenname|user_id>|<screenname|user_id>
+tweetbot://<screenname>/unfollow/<screenname|user_id>|<screenname|user_id>
+tweetbot://<screenname>/favorite/<tweet_id>
+tweetbot://<screenname>/unfavorite/<tweet_id>
+tweetbot://<screenname>/retweet/<tweet_id>
+※引数callback_urlとは、送信画面が閉じた直後にSafariで開かれるURLエンコード済URLのこと。 
+
+バージョン1.4以降 
+
+tweetbot://<screenname>/list/<list_id>?callback_url=<url>
