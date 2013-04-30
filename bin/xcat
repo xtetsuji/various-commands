@@ -1,0 +1,19 @@
+#!/bin/bash
+# $Id: xcat,v 1.1 2005/04/05 16:32:47 ogata Exp $
+# $Source: /var/cvs/bin/common/xcat,v $
+
+while [ $1 ] ; do
+    if [ ! -f $1 ] ; then
+	echo "$0: $1 not found." 1>&2
+	continue
+    fi
+    if [ "${1##*.}" == "gz" ] ; then
+	zcat $1
+    elif [ "$1{##*.}" == "bz2" ] ; then
+	bzcat $1
+    else
+	cat $1
+    fi
+    shift
+done
+  
