@@ -1,0 +1,40 @@
+#!/bin/bash
+# ogata 2011/02/20
+# for Linux GNU script and scriptreplay
+
+DEFAULT_DIR=$HOME/tmp
+
+NAME=$1
+DIR=$2
+
+function usage() {
+    echo "Usage:"
+    echo "  $(basename $0) name [dir]"
+    echo ""
+    echo "  load <naem>.script and <anme>.time at dir"
+    echo "  if omitted, dir=$DEFAULT_DIR"
+    exit
+}
+
+if ! type scriptreplay >/dev/null 2>&1 ; then
+    echo "script is old? so scriptreplay is not found"
+    exit
+fi
+
+if [ -z "$1" ] || [ $1 = --help ] || [ $1 = -h ] ; then
+    usage
+elif echo $1 | grep -v -E '[a-zA-Z0-9_.-]' >/dev/null 2>&1 ; then
+    echo "Illegal NAME" 2>&1
+fi
+
+if [ -z "$2" ] ; then
+    DIR=$DEFAULT_DIR
+fi
+
+if [ ! -d $2 ] ; then
+    echo "directory \"$DIR\" is not found." 2>&1
+fi
+
+echo "=== scriptreplay is started ==="
+scriptreplay $DIR/$NAME.time $DIR/$NAME.script
+echo "=== scriptreplay is finished ==="
