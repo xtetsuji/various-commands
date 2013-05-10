@@ -17,3 +17,30 @@ while [ $1 ] ; do
     shift
 done
   
+exit
+
+: <<EOF
+
+=pod
+
+=head1 NAME
+
+xcat - contextual cat
+
+=head1 SYNOPSIS
+
+ xcat foo.txt
+
+ xcat bar.txt.gz
+
+ xcat buz.txt.bz2
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by OGATA Tetsuji
+
+This script's license is B<MIT License>.
+
+=cut
+
+EOF

@@ -2,3 +2,27 @@
 
 echo $PATH | sed -e 's/:/\
 /g'
+
+exit
+
+: <<EOF
+
+=pod
+
+=head1 NAME
+
+pathview - view current exportted PATH
+
+=head1 SYNOPSIS
+
+ pathview
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by OGATA Tetsuji
+
+This script's license is B<MIT License>.
+
+=cut
+
+EOF

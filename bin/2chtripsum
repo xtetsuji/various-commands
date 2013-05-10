@@ -102,3 +102,46 @@ sub random_string {
 #         $GB->{TRIPSTRING} =~ tr/+/./;
 #     }
 # }
+
+exit;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+2chtripsum - Calculation 2ch trip.
+
+=head1 SYNOPSIS
+
+ # Keyword calculation mode.
+ $ 2chtripsum SeCrEt KeYwOrD
+ SeCrEt  ◆qSA.E5eFvo
+ KeYwOrD ◆BqbNxZmDag
+
+ # Random calculation mode.
+ $ 2chtripsum RANDOM
+ ... output any random strings trip ...
+
+=head1 DESCRIPTIONS
+
+This module is 2ch trip calulation module.
+
+
+
+=head1 SEE ALSO
+
+L<2ch trip description on Wikipedia|http://ja.wikipedia.org/w/index.php?title=%E3%83%88%E3%83%AA%E3%83%83%E3%83%97_(%E9%9B%BB%E5%AD%90%E6%8E%B2%E7%A4%BA%E6%9D%BF)>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by OGATA Tetsuji
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=cut
