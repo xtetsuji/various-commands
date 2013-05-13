@@ -6,6 +6,8 @@ use strict;
 use warnings;
 use utf8;
 
+our $VERSION = '0.01';
+
 use Cwd qw(getcwd);
 use Encode;
 use File::Basename qw(dirname);
@@ -15,9 +17,7 @@ use Getopt::Long;
 use LWP::UserAgent;
 use Pod::Usage qw(pod2usage);
 
-use constant DEBUG => 1;
-
-our $VERSION = '0.01';
+use constant DEBUG => $ENV{DEBUG};
 
 my $DB_DIR = dirname(__FILE__);
 
@@ -56,15 +56,14 @@ elsif ( $opt{clean} ) {
 
 my $TERMINAL_CHARSET = ($ENV{LANG} =~ /\.([^.]+)$/)[0] || 'utf-8';
 
-$TERMINAL_CHARSET =~ s/-//;
 $TERMINAL_CHARSET = lc $TERMINAL_CHARSET;
 
 print "TERMINAL_CHARSET=$TERMINAL_CHARSET\n" if DEBUG;
 
-binmode STDOUT, $TERMINAL_CHARSET;
-binmode STDERR, $TERMINAL_CHARSET;
+binmode STDOUT, $TERMINAL_CHARSET =~ /^utf-?8$/ ? ':utf8': ":encoding($TERMINAL_CHARSET)";
+binmode STDERR, $TERMINAL_CHARSET =~ /^utf-?8$/ ? ':utf8': ":encoding($TERMINAL_CHARSET)";
 
-my $keyword = decode($TERMINAL_CHARSET, shift || '');
+my $keyword = Encode::decode($TERMINAL_CHARSET, shift || '');
 $keyword =~ s/-//g;
 
 if ( !$keyword ) {
@@ -89,14 +88,16 @@ while (<$csv_fh>) {
     print and $match_count++ if /$keyword_re/;
 }
 
-if ( !$match_count ) {
-    print "no match\n";
-}
+print "no match\n" if !$match_count;
 
 exit;
 
 sub get {
     my $cur_dir = getcwd();
+    if ( -f $CSV_FILE ) {
+        print "already got.\n";
+        return;
+    }
     chdir $DB_DIR
         or die "chdir failed: $!\n";
     my $ua = LWP::UserAgent->new();
@@ -162,5 +163,8 @@ jpzipcode.pl - 日本の郵便番号を検索
 
  # search zipcode
  jpzipcode.pl 0030001
+
+ # 市区町村を検索
+ jpzipcode.pl 中野区
 
 =cut
