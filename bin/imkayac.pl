@@ -231,6 +231,11 @@ If you use config file, then this program needs L<Config::PL>.
 
 If you use secret key authentication, then this program needs L<Digest::SHA>.
 
+=head1 HTTP PROXY
+
+If you use L<LWP::UserAgent>, then this module use proxy environments.
+see L<LWP::UserAgent>'s perldoc and "http_proxy" environment.
+
 =head1 SEE ALSO
 
 L<im.kayac.com API Document|http://im.kayac.com/#docs>
