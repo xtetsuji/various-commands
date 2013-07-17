@@ -1,0 +1,41 @@
+#!/bin/bash
+# xtetsuji 2013/07/17
+
+ENV_FILE=$(ls -1t /tmp/screen-agent-*.env | head -n 1)
+
+echo $ENV_FILE
+
+echo eval `cat $ENV_FILE`
+
+exit 
+
+: <<EOF
+
+=pod
+
+=head1 NAME
+
+attach-agent - attach latest SSH_AUTH_SOCK with cooperate screen-agent.
+
+=head1 SYNOPSIS
+
+ attach-agent
+
+=head1 DESCRIPTION
+
+(stub)
+
+=head1 SEE ALSO
+
+screen-agent
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by OGATA Tetsuji
+
+This library is free software;
+you can redistribute it and/or modify under the MIT License.
+
+=cut
+
+EOF
