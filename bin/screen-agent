@@ -1,0 +1,60 @@
+#/bin/bash
+# -*- shell-script -*-
+# xtetsuji 2013/07/17
+
+ENV_FILE=/tmp/screen-agent-$$.env
+SLEEP_SEC=1
+
+arg="$1"
+
+env | grep -F SSH_AUTH_SOCK > $ENV_FILE
+
+echo "session: $ENV_FILE"
+
+sleep $SLEEP_SEC
+
+if [ "$arg" ] ; then
+    exec $arg
+else
+    exec screen -xR
+fi
+
+exit
+
+: <<EOF
+
+=pod
+
+=head1 NAME
+
+screen-agent - ssh shortcut to screen with ssh-agent.
+
+=head1 SYNOPSIS
+
+ # screen-agent command exists at remote-server.
+ ssh remote-server screen-agetn
+
+=head1 DESCRIPTION
+
+This command is launch "screen -xR" as idiom of GNU Screen.
+It is condidered about direct launch screen at remote server
+jump default shell.
+
+It writes ssh-agent environment to temporary directory.
+If you treat this temporary file, then ssh-agent is alive
+with new SSH_AUTH_SOCK.
+
+=head1 SEE ALSO
+
+attach-agent (shell command version)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by OGATA Tetsuji
+
+This library is free software;
+you can redistribute it and/or modify under the MIT License.
+
+=cut
+
+EOF
