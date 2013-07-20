@@ -1,11 +1,13 @@
 #!/bin/bash
+# -*- shell-script -*-
 # xtetsuji 2013/07/17
+# see: screen-agent
 
 ENV_FILE=$(ls -1t /tmp/screen-agent-*.env | head -n 1)
 
 echo $ENV_FILE
 
-echo eval `cat $ENV_FILE`
+echo eval $(cat $ENV_FILE)
 
 exit 
 
@@ -23,7 +25,16 @@ attach-agent - attach latest SSH_AUTH_SOCK with cooperate screen-agent.
 
 =head1 DESCRIPTION
 
-(stub)
+This command is load valid current SSH_AUTH_SOCK environment
+variable from text file written by screen-agent command.
+
+If you launch ssh with screen-agent for shortcut launch default shell,
+then SSH_AUTH_SOCK environment information is written to specify
+text file by screen-agent command. This command is load it and
+tell SSH_AUTH_SOCK information to current GNU screen session.
+
+attach-agent mechanism is seek latest specify file name.
+Maybe latest file is valid, we think simply.
 
 =head1 SEE ALSO
 
