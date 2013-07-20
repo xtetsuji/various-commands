@@ -32,7 +32,7 @@ screen-agent - ssh shortcut to screen with ssh-agent.
 =head1 SYNOPSIS
 
  # screen-agent command exists at remote-server.
- ssh remote-server screen-agetn
+ ssh remote-server screen-agent
 
 =head1 DESCRIPTION
 
