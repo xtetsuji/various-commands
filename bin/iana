@@ -1,0 +1,26 @@
+#!/bin/bash
+# xtetsuji 2013/08/13
+
+arg="$1"
+
+### customize for your environment.
+IANA_TXT="$HOME/doc/iana.txt"
+SERVICES=/etc/services
+
+if [ "x$arg" = "x--help" -o "x$arg" = "x--usage" -o -z "$arg" ] ; then
+    echo <<EOF
+Usage:
+  $0 [--help|--usage] service_or_number_re
+EOF
+fi
+
+if [ -f $SERVICES ] ; then
+    FILES=$SERVICES
+fi
+
+if [ -f "$IANA_TXT" ] ; then
+    FILES=" $IANA_TXT"
+fi
+
+grep --color=auto $arg $FILES
+
