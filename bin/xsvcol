@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $delimiter = shift;
+my $column_number = shift;
+
+my $delimiter_re = qr/$delimiter/;
+
+print $delimiter_re, "\n";
+
+if ( !$delimiter || !defined $column_number || $column_number !~ /^[0-9]+/ ) {
+    die <<END_USAGE;
+$0 DELIMITER COLUMN_NUMBER
+END_USAGE
+}
+
+while (<>) {
+    chomp;
+    my @row = split /$delimiter_re/, $_;
+    print "$row[$column_number]\n";
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ xsvcol - column split some separate value format
+
+=head1 SYNOPSIS
+
+ # pid list
+ ps aux | grep foo | xsvcol '\s+' 
+
+=cut
