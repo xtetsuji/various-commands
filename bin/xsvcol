@@ -33,6 +33,28 @@ __END__
 =head1 SYNOPSIS
 
  # pid list
- ps aux | grep foo | xsvcol '\s+' 
+ ps aux | grep foo | xsvcol '\s+' 2
+
+=head1 DETAIL
+
+=over
+
+=item 1st argument
+
+Regular expression of separator.
+
+=item 2nd argument
+
+Field number of columns. 1-oriented.
+
+=back
+
+=head1 AUTHOR
+
+OGATA Tetsuji E<lt>tetsuji.ogata {at} gmail.comE<gt>
+
+=head1 LICENSE
+
+This program is licensed by MIT License.
 
 =cut
