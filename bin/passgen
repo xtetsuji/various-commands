@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+# $Id: passgen,v 1.1 2008/03/14 16:55:45 ogata Exp $
+# $Source: /var/cvs/bin/common/passgen,v $
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+
+srand;
+
+my $p = Getopt::Long::Parser->new(
+    config => [qw(posix_default no_ignore_case auto_help)]
+);
+$p->getoptions(
+    'version!'       => \my $version,
+    't|type=s'       => \my $type,
+    'l|length=i'     => \my $length,
+    'h|help'         => \my $help,
+    'usage'          => \my $usage,
+);
+
+if ( $help || $usage ) {
+    pod2usage(0);
+}
+
+if ( !$length ) {
+    $length = shift @ARGV;
+    if ( !$length || $length =~ /\D/ ) {
+        $length = 8;
+    }
+}
+
+$type = lc $type if $type;
+
+my @password_chars;
+if ( !$type || $type eq 'alphanum' ) {
+    @password_chars = (0..9, 'a'..'z', 'A'..'Z');
+}
+elsif ( $type eq 'alpha' ) {
+    @password_chars = ('a'..'z', 'A'..'Z');
+}
+elsif ( $type =~ /^num(?:ber)?/ ) {
+    @password_chars = (0..9);
+}
+elsif ( $type eq 'ascii' ) {
+    @password_chars = map { chr } 0x21..0x7e;
+}
+
+print join '', map { $password_chars[ int rand @password_chars ] }  (1) x $length;
+print "\n";
+
+=pod
+
+=head1 NAME
+
+passgen
+
+=head1 SYNOPSIS
+
+ passgen
+ passgen 12
+ passgen --type=ascii --length=8
+
+=head1 OPTIONS
+
+=head2 type
+
+alphanum (default), alpha, num/number, ascii
+
+=head2 length
+
+password length.
+
+=head2 AUTHOR
+
+OGATA Tetsuji E<lt>tetsuji.ogata {at} gmail.com E<gt>
+
+=cut
