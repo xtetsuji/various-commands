@@ -7,7 +7,7 @@ You use it one of following method. Example:
     $ mkdir /path/to/git/xtetsuji/
     $ cd /path/to/git/xtetsuji/
     $ git clone git://github.com/xtetsuji/various-commands.git
-    $ PATH=$PATH:/path/to/git/xtetsuji/bin
+    $ PATH=$PATH:/path/to/git/xtetsuji/various-commands/bin
 
 If you use it's "Path Method", you will write this path setting to "~/.bashrc".
 
