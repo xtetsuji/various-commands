@@ -6,7 +6,7 @@ if [ ! "$TERM" = "screen" ] ; then
     exit 0
 fi
 
-if [ $( echo $1 | egrep "^[0-9]+$" ) ] ; then
+if [[ "$1" =~ ^[0-9]+$ ]] ; then
     dispnum=$1
     shift
 fi
@@ -14,24 +14,24 @@ fi
 cmdline=$@
 shift $(( $# - 1 ))
 host=$1
-# TODO: ��äƤ��뤳�Ȥγ�˥����ɤ�ʣ��
+# TODO: やっていることの割にコードが複雑
 
 if [ "$TERM" = "screen" ] ; then
     screen -t ${host%%.*} $dispnum env TERM=vt100 ssh $@
 fi
 
 # zcssh [SCREEN NUMBER] [SSH OPTIONS] HOST
-# 
-# ���������ϥ��ե�ʤ��Τ����ο����ʤ顢����� screen �ֹ�ˤ��롣
-# �����Ǥʤ��ʤ顢ssh ���Ϥ������Ȥ��ƥ��ȥå���
-# screen ���Ϥ� title �ϡ�HOST ����ǽ�ΥɥåȤޤǤ�ʸ����
-# FQDN ���Ф���ۥ���̾�Ȥ������Ȥǡ�
-# 
-# TODO: .screenrc �ǲ��Ȥ��Ǥ��ʤ���Τ���
-# 
-# ���Ȥ�
-#  * ssh screen ��Хå����饦��ɤǺ��
-#  * window ��ʬ�䤷�Ʋ��� ssh screen
-# �ʤ�ƥХꥨ������󤬤���Ф���
+#
+# 第一引数がハイフンなしのただの数字なら、それを screen 番号にする。
+# そうでないなら、ssh に渡す引数としてストック。
+# screen へ渡す title は、HOST から最初のドットまでの文字列。
+# FQDN に対するホスト名ということで。
+#
+# TODO: .screenrc で何とかできないものか。
+#
+# あとは
+# * ssh screen をバックグラウンドで作る
+# * window を分割して下に ssh screen
+# なんてバリエーションがあればいい
 #
 # zcssh [dispnum] [zcopt...] [sshopt] host ???
