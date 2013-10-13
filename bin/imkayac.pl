@@ -65,7 +65,11 @@ $p->getoptions(
 
 my %conf;
 if ( HAVE_CONFIG_PL && -f CONFIG_FILENAME ) {
-    %conf = config_do CONFIG_FILENAME;
+    local $@;
+    %conf = eval { config_do(CONFIG_FILENAME); };
+    if ( $@ ) {
+        die qq{Can not execute "config_do". Need Config::PL module if specify config file exist: $@};
+    }
 }
 
 my $message = shift;
