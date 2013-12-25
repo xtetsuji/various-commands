@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+# alternate of md5sum
+
+use strict;
+use warnings;
+
+use Digest::MD5;
+
+for my $file (@ARGV) {
+    my $ctx = Digest::MD5->new;
+    open my $fh, '<', $file
+        or do { warn $!; next; };
+    $ctx->addfile($fh);
+    printf "%s  %s\n", $ctx->hexdigest, $file;
+}
