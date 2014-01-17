@@ -1,17 +1,30 @@
 #!/bin/bash
 # xtetsuji 2013/08/13
+# iana is management and search command of personal used ports.
 
 arg="$1"
 
+if [ -z "$arg" ] ; then
+    arg="--usage"
+fi
+
 ### customize for your environment.
-IANA_TXT="$HOME/doc/iana.txt"
+if [ -z "$IANA_TXT" ] ; then
+    IANA_TXT="$HOME/doc/iana.txt"
+fi
 SERVICES=/etc/services
 
 if [ "x$arg" = "x--help" -o "x$arg" = "x--usage" -o -z "$arg" ] ; then
-    echo <<EOF
+    cat <<EOF
 Usage:
-  $0 [--help|--usage] service_or_number_re
+  `basename $0` [--help|--usage] service_or_number_re
 EOF
+    exit
+fi
+
+if [ ! -z "$IANA_TXT" ] && [ ! -f "$IANA_TXT" ] ; then
+    echo "IANA_TXT=\"$IANA_TXT\" is not found." >&2
+    exit 1
 fi
 
 if [ -f $SERVICES ] ; then
@@ -24,3 +37,34 @@ fi
 
 grep --color=auto $arg $FILES
 
+exit
+
+: <<EOF
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+iana - management and search command of personal used ports.
+
+=head1 SYNOPSIS
+
+ iana SEARCH_STRING
+
+=head1 DESCRIPTION
+
+iana sees environment variable $IANA_TXT or it's inner definition $IANA_TXT.
+iana searches those and "/etc/services".
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by OGATA Tetsuji
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+EOF
