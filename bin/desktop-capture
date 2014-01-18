@@ -1,0 +1,98 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use constant CAPTURE_INTERVAL => 10;
+
+my $outdir = $ENV{DESKTOP_CAPTURE_OUTDIR}
+    || $ENV{HOME} . '/Pictures/ScreenCapture';
+
+if ( !-d $outdir ) {
+    die qq{outdir="$outdir" is not found.\n};
+}
+
+my $counter = 1;
+
+sub capture {
+    my $filename = sprintf '%08d.png', $counter;
+    my $outpath = $outdir . '/' . $filename;
+    my $res = system 'screencapture', '-x', $outpath;
+    $counter++;
+}
+
+while(1) {
+    capture();
+    sleep CAPTURE_INTERVAL;
+}
+
+exit;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+desktop-capture - capturing desktop image for Mac OS X
+
+=head1 SYNOPSIS
+
+ desktop-capture &
+
+Ctrl+C or fg -> kill for terminate the process.
+
+ # for create desktop movie
+ desktop-mkmovie
+
+=head1 DESCRIPTION
+
+Original file is "desktop-capture.py".
+
+Its port by OGATA Tetsuji at 2014/01/19.
+
+=head1 CONFIGURATION
+
+Configuration is hard-coded on this script.
+
+If you want to change "output directory" from outside,
+then export environment variable "DESKTOP_CAPTURE_OUTDIR".
+
+ # e.g. on .bash_profile
+ export DESKTOP_CAPTURE_OUTDIR=/home/ogata/data/screencapture
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by OGATA Tetsuji
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+screencapture, desktop-mkmovie
+
+=cut
+
+###
+### original Python program from ???
+###
+# #!/usr/bin/python
+# 
+# from time import sleep
+# import subprocess
+# import os
+# outdir = '/Users/ogata/Pictures/screencapture'
+# 
+# counter = 1
+# def capture():
+#     global counter
+#     filename = '%08d.png' % counter
+#     outpath = os.path.join(outdir, filename)
+#     subprocess.call(['screencapture', '-x', outpath])
+#     counter += 1
+# 
+# while True:
+#     capture()
+#     sleep(10)
+#

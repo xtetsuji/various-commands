@@ -1,0 +1,64 @@
+#!/bin/bash
+
+OUTDIR=/Users/ogata/Pictures/screencapture
+
+if [ "$DESKTOP_CAPTURE_OUTDIR" ] ; then
+    OUTDIR="$DESKTOP_CAPTURE_OUTDIR"
+fi
+
+if [ ! -d "$OUTDIR" ] ; then
+    echo "OUTDIR=\"$OUTDIR\"is not found." >&2
+    exit 1
+fi
+
+if ! type ffmpeg >/dev/null 2>&1 ; then
+    echo "ffmepg command is required."
+    exit 1
+fi
+
+ldate=$(date +%Y%m%d)
+
+ffmpeg -y -f image2 -r 10 -i "$original_images/%08d.png" -s 720x450 "screencapture$ldate.avi"
+
+exit
+
+: <<EOF
+
+=pod
+
+=head1 NAME
+
+desktop-mkmovie - make desktop movie by desktop-capture data.
+
+=head1 SYNOPSIS
+
+ desktop-mkmovie
+
+=head1 DESCRIPTION
+
+(stub)
+
+=head1 CONFIGURATION
+
+Configuration is hard-coded on this script.
+
+If you want to change "output directory" from outside,
+then export environment variable "DESKTOP_CAPTURE_OUTDIR".
+
+ # e.g. on .bash_profile
+ export DESKTOP_CAPTURE_OUTDIR=/home/ogata/data/screencapture
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by OGATA Tetsuji
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+screencapture, desktop-capture
+
+=cut
+
+EOF
