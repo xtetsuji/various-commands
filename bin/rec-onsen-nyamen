@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+# ogata at 2014/01/11
+
+use strict;
+use warnings;
+
+use constant DEBUG => $ENV{DEBUG};
+use constant TOPPAGE_URL => 'http://onsen.ag/';
+
+use Web::Query;
+
+my %ua_name = (
+    iPhone_iOS6 => 'Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A403 Safari/8536.25',
+);
+
+my $ua = LWP::UserAgent->new( agent => $ua_name{iPhone_iOS6} );
+
+$Web::Query::UserAgent = $ua;
+
+my $document = wq(TOPPAGE_URL);
+
+# Array.prototype.forEach.call(document.getElementsByTagName("form"), function(el){attr=el.getAttribute("action"); if(attr.match(/nyamen[0-9]+\.mp3/))console.log(attr)})
+
+my @forms = $document->find(q{form[action*="radio/nyamen"]}); #->find(q{form[action$=".mp3"]});
+
+if ( @forms != 1 ) {
+    die "form count is wonder.";
+}
+
+my $url = $forms[0]->attr("action");
+
+my ($filename) = $url =~ m{/([^/]+)$};
+
+if ( !$filename ) {
+    die "fiename is not determined.";
+}
+
+warn "url=$url filename=$filename\n" if DEBUG;
+
+my $res = $ua->get( $url, ":content_file" => $filename );
+
+if ( $res->is_success ) {
+    print "success\n";
+    #print "length is " . ( length $res->content ) . "\n";
+    print "output to $filename\n";
+}
+else {
+    print "failed\n";
+    print $res->as_string, "\n";
+}
+
+exit;
+
+__END__

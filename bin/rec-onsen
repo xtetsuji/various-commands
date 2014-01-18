@@ -1,0 +1,126 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+
+binmode STDOUT, ':utf8';
+
+use constant DEBUG => $ENV{DEBUG};
+use constant TOPPAGE_URL => 'http://onsen.ag/';
+
+use Pod::Usage qw(pod2usage);
+use Web::Query;
+use HTML::Entities;
+
+my $bangumi = shift;
+my $output_filename = shift;
+
+my %ua_name = (
+    iPhone_iOS6 => 'Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A403 Safari/8536.25',
+);
+
+my $ua = LWP::UserAgent->new( agent => $ua_name{iPhone_iOS6} );
+
+$Web::Query::UserAgent = $ua;
+
+my $document = wq(TOPPAGE_URL);
+
+if ( !$bangumi || $bangumi eq '--help' || $bangumi eq '--usage' || $bangumi eq '-h' ) {
+    pod2usage();
+    exit;
+}
+elsif ( $bangumi eq '--list' ) {
+    my $div = $document
+        ->find("div")
+        ->filter(
+            sub {
+                my ($i, $elem) = @_;
+                my $html = $elem->as_html;
+                return($html =~ /このページをご覧の方へお知らせ/ ? 1 : 0);
+            });
+    my $html = $div->as_html;
+    $html =~ s/<.*?>/\n/g;
+    $html =~ s/\n\n*/\n/g;
+    print decode_entities($html), "\n";
+    print "--- list ---\n";
+    $document->find(".title")->each(
+        sub {
+            my $i = shift;
+            printf "%12s: %s\n", $_->attr("id"), $_->text;
+        },
+    );
+    exit;
+}
+elsif ( $bangumi eq '--idlist' ) {
+    my @idlist;
+    $document->find(".title")->each(
+        sub {
+            my $i = shift;
+            push @idlist, $_->attr("id");
+        }
+    );
+    for my $id (@idlist) {
+        print "$id\n";
+    }
+    exit;
+}
+
+my @forms = $document->find(qq{form[action*="radio/$bangumi"]});
+
+if ( @forms != 1 ) {
+    die "form count is wonder.";
+}
+
+my $url = $forms[0]->attr("action");
+
+my ($filename) = $url =~ m{/([^/]+)$};
+if ( $output_filename ) {
+    $filename = $output_filename;
+}
+
+if ( !$filename ) {
+    die "fiename is not determined.";
+}
+
+warn "url=$url filename=$filename\n" if DEBUG;
+
+my $res = $ua->get( $url, ":content_file" => $filename );
+
+if ( $res->is_success ) {
+    print "success\n";
+    #print "length is " . ( length $res->content ) . "\n";
+    print "output to $filename\n";
+}
+else {
+    print "failed\n";
+    print $res->as_string, "\n";
+}
+
+exit;
+
+=pod
+
+=head1 NAME
+
+rec-onsen - Recoding onsen.ag
+
+=head1 SYNOPSIS
+
+ rec-onsen BANGUMI_NAME [OUTPUT_FILENAME]
+ rec-onsen --list
+ rec-onsen --idlist
+ rec-onsen --help
+
+=head1 DESCRIPTIONS
+
+(stub)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by OGATA Tetsuji
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
