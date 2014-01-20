@@ -38,7 +38,6 @@ if [ $# -eq 1 ]; then
     fi
  
     mimms -r ${WMVFILE} "${TITLE}.asf"
-    mimms -r ${WMVFILE} "${TITLE}.2.asf"
  
 else
     echo "usage: `basename $0` STRING"
