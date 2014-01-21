@@ -1,0 +1,100 @@
+#!/bin/bash
+# $Id$
+function usage {
+    cat <<EOF
+Usage: $0 [-s|-f|-r|-h|-v]
+● これは何 ?
+ssh-agent をフォワーディングさせたリモートホストで、既存の screen を
+アタッチしたときに、それに ssh-agent フォワーディング情報を教える
+ためのプログラムです
+● インストール方法
+パスが通った場所に配置して ~/.bash_profile に
+    eval \$( $0 -s )
+などと書きます
+一連の処理の後に attach-agent という関数が定義されるので
+既存の screen をアタッチした後に、そこから起動した (されている)
+bash 上で attach-agent を実行するだけです
+backtick に attach-agent を設定しておくと透過的なのかな ?
+
+EOF
+    exit
+}
+
+OPT_S='false'
+OPT_R='false'
+OPT_F='false'
+OPT_V='false'
+
+while getopts ":sfrvh" opt ; do
+    case $opt in
+	s ) OPT_S='true' ;;
+	f ) OPT_F='true' ;;
+	r ) OPT_R='true' ;;
+	v ) OPT_V='true' ; IS_VERBOSE='-v' ;;
+	h ) usage ; exit ;;
+	\? ) echo "Usage: $0 [-s|-f|-r|-h]" 1>&2 ; exit ;;
+    esac
+done
+shift $(( OPTIND - 1 ))
+
+if $OPT_S && $OPT_F ; then
+    echo "screen-agent: can not specify -s and -f at same time yet..." 1>&2
+    exit
+fi
+
+if $OPT_R ; then
+    echo "screen-agent: remove screen-agent's temprary file(s) in /tmp."
+    find /tmp -name screen-agent.$USER.\* -perm +u+w -exec rm $IS_VERBOSE {} \; 2> /dev/null
+fi
+
+# eval に読んでもらう用に、改行はエスケープしている
+if $OPT_F ; then
+    # attach-agent 要件
+    # * Detach または Attach された screen が (現状ひとつ) 存在している必要がある
+    # * $USER に '.' が含まれているとだめ
+    # そのた
+    # * 一番新しい (PIDが大きい) やつを信用しているのもアレゲ
+    #   PID 大きいって基準はやめたけど
+    # * -ls がうまくいけば -X で変数設定しちゃうので $TERM=screen はいいかなと
+    # * screen で既に開かれたローカル bash については、attach-agent を個別に
+    #   叩く必要がある (backtick でどうにかなるかな)
+
+    cat <<EOF
+function attach-agent {
+    SCREEN_AGENT_ENVFILE=\$( ls -1t /tmp/screen-agent.\$USER.* | head -1 2> /dev/null ) ; \
+    if [ -z \$SCREEN_AGENT_ENVFILE ] || [ ! -s \$SCREEN_AGENT_ENVFILE ] ; then \
+        echo "attach-agent: can not find screen-agent variable file \$SCREEN_AGENT_ENVFILE." 1>&2 ; \
+    elif ! ( screen -ls | grep 'No Socket found in' > /dev/null ) ; then \
+        echo "read \$SCREEN_AGENT_ENVFILE" ; \
+        source \$SCREEN_AGENT_ENVFILE ; \
+        screen -X eval 'unsetenv SSH_AUTH_SOCK' 'unsetenv SSH_CLIENT' ; \
+        cat \$SCREEN_AGENT_ENVFILE | sed -e 's/=/ /' | xargs -n 2 screen -X setenv ; \
+    else \
+        echo "attach-agent: no find detached screen!" 1>&2 ; \
+    fi ; \
+}
+EOF
+    # こちらは 'EOF' なので、シェル展開しない \改行 も使えないわけだが
+
+    # eval `screen-agent -sf ` できないみたいなのなんでだろ……
+elif $OPT_S ; then
+    SCREEN_AGENT_ENVFILE=/tmp/screen-agent.$USER.$$
+    # .bash_profile でやること
+    # * ログイン時の環境変数 SSH_AUTH_SOCK SSH SSH_CLIENT SSH_CONNECTION をダンプ
+    # * ダンプしたファイルの許可情報を 600 にする
+    # * 関数 attach-agent を定義 (自身を -f つきで実行すると定義を出力する)
+    cat <<END_OF_SCRIPT
+export SCREEN_AGENT_ENVFILE=$SCREEN_AGENT_ENVFILE; \
+set | egrep '^SSH_[AC]' > $SCREEN_AGENT_ENVFILE; \
+if [ -s $SCREEN_AGENT_ENVFILE ] ; then \
+    chmod 600 $SCREEN_AGENT_ENVFILE; \
+else \
+    echo "screen-agent: do not exist or empty $SCREEN_AGENT_ENVFILE" 1>&2; \
+fi
+END_OF_SCRIPT
+fi
+
+# TODO::
+#    デタッチしている screen の既存のシェルに attach-agent を教えてまわる
+#    デタッチしている screen の既存のシェルに screen-agent を教えてまわる
+#    デタッチしている screen の新規のシェルに attach-agent 関数定義を伝える何か
