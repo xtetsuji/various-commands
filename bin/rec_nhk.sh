@@ -66,6 +66,6 @@ esac
             -really-quiet -quiet
  
 ffmpeg -loglevel quiet -y -i "/tmp/${channel}_${date}.wav" -acodec libmp3lame -ab 128k "${outdir}/${PREFIX}_${date}.mp3"
-if [ $? = 0 ]; then
-  rm -f "/tmp/${channel}_${date}.wav"
-fi
+#if [ $? = 0 ]; then
+#  rm -f "/tmp/${channel}_${date}.wav"
+#fi
