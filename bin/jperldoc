@@ -1,0 +1,36 @@
+#!/bin/bash
+
+query="$1"
+
+function is_command_exist () {
+    command="$1"
+    if type $command >/dev/null 2>&1 ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+if is_command_exist open ; then
+    browser=open
+elif is_command_exist browser ; then
+    browser=browser
+elif is_command_exist start ; then
+    browser=start
+elif is_command_exist kstart ; then
+    browser=kstart
+elif is_command_exist w3m ; then
+    browser=w3m
+else
+    browser=""
+fi
+
+if $JPERODOC_PREFER_BROWSER ; then
+    browser=$JPERODOC_PREFER_BROWSER
+fi
+
+if [ -z "$browser" ] ; then
+    echo "not found browser"
+fi
+
+exec $browser "http://perldoc.jp/$query"
