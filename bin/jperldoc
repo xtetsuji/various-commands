@@ -25,12 +25,13 @@ else
     browser=""
 fi
 
-if $JPERODOC_PREFER_BROWSER ; then
+if [ -n "$JPERODOC_PREFER_BROWSER" ] ; then
     browser=$JPERODOC_PREFER_BROWSER
 fi
 
 if [ -z "$browser" ] ; then
     echo "not found browser"
+    exit 1
 fi
 
 exec $browser "http://perldoc.jp/$query"
