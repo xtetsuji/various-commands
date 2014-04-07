@@ -19,10 +19,11 @@ if [ $# -eq 1 ]; then
     STR=$1
  
     # save asx file
+    # tail なのは最終回のときに最終回の一つ前のものが上に来る事例があったから
     wget -q -O - http://hibiki-radio.jp/description/${STR} | \
         grep WMV | \
         perl -ne 'm{src\s*=\s*"(http:.*?)"}x and print "$1\n"' | \
-        head -1 | \
+        tail -1 | \
         xargs wget -q -O ${TMPFILE}
 
     if [ -z ${TMPFILE} ]; then
