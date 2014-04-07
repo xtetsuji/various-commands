@@ -1,6 +1,7 @@
 #!/bin/sh
 # hibiki.sh ver.0.5.6 (2013-02-13)
 # require wget, perl, and mimms
+# optional ffmpeg
 #
 # hibiki.sh CHANNEL_NAME
 #
@@ -39,6 +40,10 @@ if [ $# -eq 1 ]; then
     fi
  
     mimms -r ${WMVFILE} "${TITLE}.asf"
+
+    if type ffmpeg >/dev/null 2>&1 ; then
+        ffmpeg -i "${TITLE}.asf" "${TITLE}.m4a"
+    fi
  
 else
     echo "usage: `basename $0` STRING"
