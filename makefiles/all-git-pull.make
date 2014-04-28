@@ -6,16 +6,16 @@ usage:
 
 statues:
 	@for d in */ ; do \
-		( cd $$d ; echo "=> " $$d ; git status --short | sed -e 's/^/  /') ; \
+		( cd $$d ; echo "###" ; echo "### $$d" ; echo "###" ; git status --short | sed -e 's/^/  /') ; \
 	done
 
 full-statues:
 	@for d in */ ; do \
-		( cd $$d ; echo "=> " $$d ; git status | sed -e 's/^/  /') ; \
+		( cd $$d ; echo "###" ; echo "### $$d" ; echo "###" ; git status | sed -e 's/^/  /') ; \
 	done
 
 all-pull:
 	@for d in */ ; do \
-		( cd $$d ; echo "=> " $$d ; git pull ; ) ; \
+		( cd $$d ; echo "###" ; echo "### $$d" ; echo "###" ; git pull ; ) ; \
 	done
 
