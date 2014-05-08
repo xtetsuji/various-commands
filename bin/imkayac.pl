@@ -139,7 +139,7 @@ __END__
 
 =head1 NAME
 
-imkayac.pl - very lightweight program to send im.kayac.com.
+imkayac.pl - Very very lightweight program to send im.kayac.com.
 
 =head1 SYNOPSIS
 
@@ -237,12 +237,16 @@ If you use secret key authentication, then this program needs L<Digest::SHA>.
 
 =head1 HTTP PROXY
 
-If you use L<LWP::UserAgent>, then this module use proxy environments.
-see L<LWP::UserAgent>'s perldoc and "http_proxy" environment.
+When you use both L<LWP::UserAgent> and L<HTTP::Tiny>,
+this module use proxy environments.
+See L<LWP::UserAgent>'s perldoc and "http_proxy" environment, or
+L<HTTP::Tiny>'s perldoc and "PROXY SUPPORT" manual.
 
 =head1 SEE ALSO
 
-L<im.kayac.com API Document|http://im.kayac.com/#docs>
+L<im.kayac.com API Document|http://im.kayac.com/#docs>,
+
+L<WebService::ImKayac::Simple> is a best solution of your ImKayac life.
 
 =head1 AUTHOR
 
