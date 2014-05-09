@@ -21,6 +21,8 @@ elif is_command_exist kstart ; then
     browser=kstart
 elif is_command_exist w3m ; then
     browser=w3m
+elif is_command_exist perldocjp ; then
+    browser=perldocjp
 else
     browser=""
 fi
@@ -34,4 +36,8 @@ if [ -z "$browser" ] ; then
     exit 1
 fi
 
-exec $browser "http://perldoc.jp/$query"
+if [ $browser = perldocjp ] ; then
+    perldocjp $query
+else
+    exec $browser "http://perldoc.jp/$query"
+fi
