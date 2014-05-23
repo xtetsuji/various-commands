@@ -73,7 +73,7 @@ alphanum (default), alpha, num/number, ascii
 
 password length.
 
-=head2 AUTHOR
+=head1 AUTHOR
 
 OGATA Tetsuji E<lt>tetsuji.ogata {at} gmail.com E<gt>
 
