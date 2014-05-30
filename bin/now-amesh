@@ -19,9 +19,19 @@ my $url = sprintf "http://img.miniy.net/mesh/view/000/%d%02d%02d%02d%02d.gif",
     $t->year, $t->mon, $t->mday, $t->hour, $t->min;
 
 if ( $arg eq 'open' ) {
-    system 'open', $url;
+    for my $browser (qw/open browser firefox/) {
+        if ( command_detect($browser) ) {
+            system $browser, $url;
+            last;
+        }
+    }
 } else {
     print "$url\n";
+}
+
+sub command_detect {
+    my $command = shift;
+    return 0 == system "type $command >/dev/null 2>&1";
 }
 
 =pod
