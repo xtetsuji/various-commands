@@ -44,7 +44,7 @@ now-amesh - print or open now Tokyo amesh image by "Tokyo amesh log".
 
  ### print mode
  $ now-amesh
- ### open mode (for Mac). open the image URL by your default browser.
+ ### open mode. open the image URL by your default browser.
  $ now-amesh open
 
 =head1 COPYRIGHT AND LICENSE
