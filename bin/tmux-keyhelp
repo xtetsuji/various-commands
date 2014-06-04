@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+# print tmux keybind by Japanese description
+# 2014/05/07
+
+use strict;
+use warnings;
+use utf8;
+
+my $tmux_list_keys = `tmux list-keys`;
+
+binmode STDOUT, ':utf8';
+
+# TODO: I18N
+my %dictionary = (
+    'next-window' => '次のウィンドウへ',
+    'new-window'  => '新しいウィンドウを作成',
+);
+
+my @list_keys = split /\n/, $tmux_list_keys;
+
+for my $list (@list_keys) {
+    my ($bind, $opt, $key, $description) = $list =~ /^(bind-key) (-r|  ) +(.*?) (.*)/;
+    my $description_from_dictionary = $dictionary{$description};
+    if ( $description_from_dictionary ) {
+        printf "%10s %s\n", $key, $description_from_dictionary;
+    } else {
+        printf "%10s %s\n", $key, $description;
+    }
+}

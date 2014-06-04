@@ -18,6 +18,8 @@ if [ "x$arg" = "x--help" -o "x$arg" = "x--usage" -o -z "$arg" ] ; then
     cat <<EOF
 Usage:
   `basename $0` [--help|--usage] service_or_number_re
+
+  IANA_TXT=$IANA_TXT
 EOF
     exit
 fi

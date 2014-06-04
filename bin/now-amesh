@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+# xtetsuji at 2014/05/27
+
+use strict;
+use warnings;
+
+use Time::Piece;
+use Time::Seconds;
+
+my $arg = shift || '';
+
+my $t = localtime;
+$t -= $t->sec;
+my $min_mod_5 = $t->min % 5;
+$t -= $min_mod_5 * ONE_MINUTE;
+$t -= 5 * ONE_MINUTE;
+
+my $url = sprintf "http://img.miniy.net/mesh/view/000/%d%02d%02d%02d%02d.gif",
+    $t->year, $t->mon, $t->mday, $t->hour, $t->min;
+
+if ( $arg eq 'open' ) {
+    for my $browser (qw/open browser firefox/) {
+        if ( command_detect($browser) ) {
+            system $browser, $url;
+            last;
+        }
+    }
+} else {
+    print "$url\n";
+}
+
+sub command_detect {
+    my $command = shift;
+    return 0 == system "type $command >/dev/null 2>&1";
+}
+
+=pod
+
+=head1 NAME
+
+now-amesh - print or open now Tokyo amesh image by "Tokyo amesh log".
+
+=head1 SYNOPSIS
+
+ ### print mode
+ $ now-amesh
+ ### open mode. open the image URL by your default browser.
+ $ now-amesh open
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by OGATA Tetsuji
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
