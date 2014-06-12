@@ -36,6 +36,10 @@ screen-agent - ssh shortcut to screen with ssh-agent.
 
 =head1 DESCRIPTION
 
+ *** THIS PROGRAM IS BETA VERSION. NOT WORK SOME ENVIRONMENT ***
+ *** PLEASE USE attach-agent function                        ***
+ *** at GitHub/@xtetsuji/dotfiles/.bash_aliases              ***
+
 This command is launch "screen -xR" as idiom of GNU Screen.
 It is condidered about direct launch screen at remote server
 jump default shell.
