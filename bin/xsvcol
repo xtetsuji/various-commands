@@ -6,6 +6,14 @@ use warnings;
 my $delimiter = shift;
 my $column_number = shift;
 
+if ( !$delimiter || $delimiter =~ /^(?:--help|-h)$/ ) {
+    print <<END;
+Usage:
+  xsvcol delimiter column_number
+END
+    exit;
+}
+
 my $delimiter_re = qr/$delimiter/;
 
 print $delimiter_re, "\n";
