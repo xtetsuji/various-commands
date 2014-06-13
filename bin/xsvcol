@@ -7,11 +7,8 @@ my $delimiter = shift;
 my $column_number = shift;
 
 if ( !$delimiter || $delimiter =~ /^(?:--help|-h)$/ ) {
-    print <<END;
-Usage:
-  xsvcol delimiter column_number
-END
-    exit;
+    require Pod::Usage;
+    Pod::Usage::pod2usage(0);
 }
 
 my $delimiter_re = qr/$delimiter/;
@@ -40,7 +37,9 @@ __END__
 
 =head1 SYNOPSIS
 
- # pid list
+ # pid list.
+ # 1st argument is regular expression. 
+ # 2nd argument is column number.
  ps aux | grep foo | xsvcol '\s+' 2
 
 =head1 DETAIL
