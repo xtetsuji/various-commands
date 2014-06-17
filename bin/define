@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+# xtetsuji 2014/06/17
+# need Cocoa::DictionaryServices
+#   https://github.com/akiym/Cocoa-DictionaryServices
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+
+my $p = Getopt::Long::Parser->new(
+    config => [qw(posix_default no_ignore_case auto_help)]
+);
+$p->getoptions(
+    'version!'          => \my $version,
+    'uasge|help'        => \my $help,
+    'l|list-dictionaries' => \my $list_dictionaries,
+);
+
+use Cocoa::DictionaryServices qw(lookup available_dictionaries);
+
+if ( $list_dictionaries ) {
+    for my $key (available_dictionaries()) {
+        print "$key\n";
+    }
+    exit;
+}
+
+if ( $help ) {
+    pod2usage(0);
+}
+
+my ($keyword, $dictionary) = @ARGV;
+
+if ( !$keyword ) {
+    pod2usage(1);
+} elsif ( !$dictionary ) {
+    print lookup($keyword), "\n";
+} else {
+    print lookup($keyword, $dictionary), "\n";
+}
+
+exit;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ define - Mac OS X dictionary tool
+
+=head1 SYNOPSIS
+
+ define KEYWORD
+ define KEYWORD DICTIONARY
+ define [-l|--list-dictinaries]
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 by OGATA Tetsuji
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
