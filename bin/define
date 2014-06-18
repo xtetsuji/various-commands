@@ -38,7 +38,18 @@ if ( !$keyword ) {
 } elsif ( !$dictionary ) {
     print lookup($keyword), "\n";
 } else {
-    print lookup($keyword, $dictionary), "\n";
+    print lookup($keyword, guess_dictionary($dictionary)), "\n";
+}
+
+sub guess_dictionary {
+    my $name = shift;
+    my @available_dictionaries = available_dictionaries();
+    my %dictionaries = map { lc $_ => $_ } @available_dictionaries;
+    for my $dictionary ( @available_dictionaries ) {
+        my $alias = join '', map { substr($_, 0, 1)  } split /[ -]+/, $dictionary;
+        $dictionaries{lc $alias} = $dictionary;
+    }
+    return $dictionaries{lc $name} || '';
 }
 
 exit;
