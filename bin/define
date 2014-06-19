@@ -68,6 +68,20 @@ __END__
  define KEYWORD DICTIONARY
  define [-l|--list-dictinaries]
 
+=head1 DESCRIPTION
+
+define is Mac OS X dictionary tool.
+
+You can see Dictionary list by `define -l` command.
+
+define command supports dictionary short name.
+If you use "Japanese-English", then you can specify "je".
+
+=head1 REQUIRES
+
+L<Cocoa::DictionaryServices>,
+L<https://github.com/akiym/Cocoa-DictionaryServices>
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2014 by OGATA Tetsuji
