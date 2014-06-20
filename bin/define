@@ -9,6 +9,20 @@ use warnings;
 use Getopt::Long;
 use Pod::Usage qw(pod2usage);
 
+BEGIN {
+    local $@;
+    eval {
+        require Cocoa::DictionaryServices;
+        import  Cocoa::DictionaryServices qw(lookup available_dictionaries);
+    };
+    if ( $@ ) {
+        print "Install Cocoa::DictionaryServices form GitHub\n";
+        print "  you enter following command.";
+        print "  cpanm git\@github.com:akiym/Cocoa-DictionaryServices.git\n";
+        exit;
+    }
+}
+
 my $p = Getopt::Long::Parser->new(
     config => [qw(posix_default no_ignore_case auto_help)]
 );
@@ -17,8 +31,6 @@ $p->getoptions(
     'uasge|help'        => \my $help,
     'l|list-dictionaries' => \my $list_dictionaries,
 );
-
-use Cocoa::DictionaryServices qw(lookup available_dictionaries);
 
 if ( $list_dictionaries ) {
     for my $key (available_dictionaries()) {
