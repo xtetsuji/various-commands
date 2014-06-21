@@ -8,6 +8,7 @@ use warnings;
 
 use Getopt::Long;
 use Pod::Usage qw(pod2usage);
+use Term::ANSIColor;
 
 BEGIN {
     local $@;
@@ -27,8 +28,8 @@ my $p = Getopt::Long::Parser->new(
     config => [qw(posix_default no_ignore_case auto_help)]
 );
 $p->getoptions(
-    'version!'          => \my $version,
-    'uasge|help'        => \my $help,
+    'version!'            => \my $version,
+    'uasge|help'          => \my $help,
     'l|list-dictionaries' => \my $list_dictionaries,
 );
 
@@ -45,13 +46,21 @@ if ( $help ) {
 
 my ($keyword, $dictionary) = @ARGV;
 
+my $contents;
+
 if ( !$keyword ) {
     pod2usage(1);
 } elsif ( !$dictionary ) {
-    print lookup($keyword), "\n";
+    $contents = lookup($keyword) . "\n";
 } else {
-    print lookup($keyword, guess_dictionary($dictionary)), "\n";
+    $contents = lookup($keyword, guess_dictionary($dictionary)) . "\n";
 }
+
+# decorated (no utf8, lookup takes utf-8 byte string)
+$contents =~ s/(【.*?】)/ colored($1, "blue") /e;
+$contents =~ s/(〈.*?〉)/ colored($1, "blue") /e;
+
+print $contents;
 
 sub guess_dictionary {
     my $name = shift;
