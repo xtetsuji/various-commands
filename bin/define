@@ -59,6 +59,8 @@ if ( !$keyword ) {
 # decorated (no utf8, lookup takes utf-8 byte string)
 $contents =~ s/(【.*?】)/ colored($1, "blue") /e;
 $contents =~ s/(〈.*?〉)/ colored($1, "blue") /e;
+$contents =~ s/(〖.*?〗)/ colored($1, "blue") /e;
+$contents =~ s/;/;\n\n/g; # 一行で帰ってくるから分割したほうがいい？
 
 print $contents;
 
