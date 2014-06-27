@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use URI::Escape qw(uri_unescape);
+
+my $url = shift;
+
+if ( !$url ) {
+    print "$0 url\n";
+    exit;
+}
+
+my ($schema, $hostname, $path, $query) = $url =~ m{^(https?)://(.*?)/(.*?)(\?.*)};
+
+if ( !$schema ) {
+    print "shema is not found\n";
+    exit;
+}
+
+my %query;
+if ( $query ) {
+    $query =~ s/^\?//;
+    for my $part ( split /&/, $query ) {
+        my ($key, $value) = split /=/, $part, 2;
+        $value = uri_unescape($value); # たぶん UTF-8 のバイト列
+        if ( !exists $query{$key} ) {
+            $query{$key} = $value;
+        } else {
+            if ( ref $query{$key} eq 'ARRAY' ) {
+                push @{$query{$key}}, $value;
+            } else {
+                $query{$key} = [$query{$key}, $value];
+            }
+        }
+    }
+}
+
+print "schema: $schema\n";
+print "hostname: $hostname\n";
+print "path: $path\n";
+if ( $query ) {
+    print "query:\n";
+    for my $key ( sort keys %query ) {
+        my $value = $query{$key};
+        $value =~ s/\n/\\n/g;
+        print "  $key\: $value\n";
+    }
+}
