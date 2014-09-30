@@ -120,7 +120,7 @@ radiko_record() {
   #
   channel_xml=`wget -q "http://radiko.jp/v2/station/stream/${channel}.xml" -O -`
   stream_url=`echo $channel_xml | sed 's/^\(<?xml .*\)[Uu][Tt][Ff]8\(.* ?>\)/\1UTF-8\2/' | xpath "//url/item[1]/text()" 2>/dev/null`
-  stream_url_parts=(`echo ${stream_url} | perl -pe 's!^(.*)://(.*?)/(.*)/(.*?)$/!$1://$2 $3 $4!'`)
+  stream_url_parts=`echo ${stream_url} | perl -pe 's!^(.*)://(.*?)/(.*)/(.*?)$/!$1://$2 $3 $4!'`
  
   #
   # get authtoken
@@ -172,6 +172,8 @@ if [ $# = 0 -a "$OPTION_l" = "TRUE" ]; then
   NACK5: NACK5
   YFM: FMヨコハマ
   HOUSOU_DAIGAKU: 放送大学
+
+From: curl -s http://radiko.jp/v2/station/list/JP13.xml | perl -ne 'm{<id>(.*?)</id>} and print "$1\n";' 
 EOF
   exit
 fi
