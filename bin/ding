@@ -1,0 +1,14 @@
+#!/bin/bash
+# xtetsuji 2015/05/24
+
+if type afplay >/dev/null 2>&1 ; then
+    afplay /System/Library/Sounds/Glass.aiff
+else
+    printf '\a'
+fi
+
+# $ ls /System/Library/Sounds/
+# Basso.aiff      Funk.aiff       Ping.aiff       Submarine.aiff
+# Blow.aiff       Glass.aiff      Pop.aiff        Tink.aiff
+# Bottle.aiff     Hero.aiff       Purr.aiff       
+# Frog.aiff       Morse.aiff      Sosumi.aiff     
