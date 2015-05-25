@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+# ogata 2015/05/09
+
+use strict;
+use warnings;
+use utf8;
+
+#use bytes ();
+
+my $character_sum = 0;
+my $bytes_sum = 0;
+my $line_sum = 0;
+
+while(<>) {
+    utf8::decode($_);
+    $character_sum += length $_;
+    {
+        use bytes;
+        $bytes_sum += length $_;
+    }
+    $line_sum++;
+}
+
+print <<END_OUTPUT;
+CHAR: $character_sum
+BYTE: $bytes_sum
+LINE: $line_sum
+END_OUTPUT
