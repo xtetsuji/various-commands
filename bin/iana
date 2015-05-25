@@ -10,7 +10,7 @@ fi
 
 ### customize for your environment.
 if [ -z "$IANA_TXT" ] ; then
-    IANA_TXT="$HOME/doc/iana.txt"
+    IANA_TXT="$HOME/Documents/iana.txt"
 fi
 SERVICES=/etc/services
 
