@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use HTTP::Tiny;
+
+$OGATA::CommandInstaller::VERSION = "0.01";
+
+my $sub_command = shift || 'help';
+
+my $installer = OGATA::CommandInstaller->new();
+
+$installer->dispatch($sub_command);
+
+package OGATA::CommandInstaller;
+
+our $VERSION;
+
+use strict;
+use warnings;
+
+use Carp;
+
+sub new {
+    my $class = shift;
+    return bless {}, $class;
+}
+
+sub ua {
+    my $self = shift;
+    # state 使えばいいんだけど 5.10 以前にも対応させたいので
+    # I want to support old perl previous 5.10.
+    return $self->cache_object( ua => HTTP::Tiny->new("xtetsuji-command/$VERSION") );
+}
+
+sub cache_object {
+    my $self = shift;
+    my $key  = shift or croak "key is required";
+     my $cache = $self->{cache} ||= {};
+    if ( exists $cache->{$key} ) {
+        return $cache->{$key};
+    } else {
+        if ( @_ == 0 ) {
+            croak "value is not found.";
+        } else {
+            return $cache->{$key} = shift;
+        }
+    }
+}
+
+sub dispatch {
+    my $self = shift;
+    my $sub_command = shift;
+    my $method_name = "dispatch_" . $sub_command;
+    if ( $self->can($method_name) ) {
+        return $self->$method_name(@_);
+    } else {
+        die qq(Sub command "$sub_command" is not found.\n);
+    }
+}
+
+sub dispatch_help {
+    my $self = shift;
+    print <<END_HELP;
+Usage:
+  $0 OPTIONS 
+Example:
+  $0 install NAME
+  $0 uninstall NAME
+  $0 search QUERY
+END_HELP
+    return;
+}
+
+sub dispatch_home {
+    my $self = shift;
+    my $browser_command = $^O eq 'darwin'  ? 'open'
+                        : $^O eq 'Linux'   ? 'echo' # TODO:
+                        : $^O eq 'MSWin32' ? 'start'
+                        :                    ''
+                                             ;
+    if ( $browser_command ) {
+        exit system "open" , "https://github.com/xtetsuji/various-commands";
+    } else {
+        die "browser detect failed\n";
+    }
+}
+
+sub not_implemented_yet {
+    my $self = shift;
+    print "not implemented yet\n";
+}
+
+{
+    no warnings 'once';
+    *dispatch_install = \&not_implemented_yet;
+    *dispatch_uninstall = \&not_implemented_yet;
+    *dispatch_search = \&not_implemented_yet;
+}
+
+__END__
